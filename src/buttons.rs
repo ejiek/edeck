@@ -6,40 +6,52 @@ use std::convert::TryInto;
 use streamdeck::{Colour, Error as DeckError, ImageOptions, StreamDeck};
 
 pub fn handle(mut deck: StreamDeck) {
+    let mut previous_states: Vec<u8> = vec![0; 15];
     loop {
         match deck.read_buttons(None) {
             Ok(states) => {
                 println!("{:?}", &states);
-
-                states.iter().enumerate().for_each(|(key, state)| {
-                    // This logic is broken
-                    // We need to know previous state to identify
-                    // actual press and release
-                    if *state == 1 {
-                        match key {
-                            0 => {
-                                match shell::new(vec![
-                                    String::from("/home/ejiek/.xmonad/scripts/volume.sh"),
-                                    String::from("down"),
-                                ])
-                                .exec()
-                                {
+                states
+                    .iter()
+                    .enumerate()
+                    .zip(previous_states.iter_mut())
+                    .for_each(|((key, current_state), mut previous_state)| {
+                        match (&previous_state, current_state) {
+                            (0, 1) => match key {
+                                0 => {
+                                    match shell::new(vec![
+                                        String::from("/home/ejiek/.xmonad/scripts/volume.sh"),
+                                        String::from("down"),
+                                    ])
+                                    .exec()
+                                    {
+                                        Ok(state_update) => {
+                                            update_state(&mut deck, key, state_update)
+                                        }
+                                        Err(e) => println!("Error during action: {:?}", e),
+                                    }
+                                }
+                                _ => match green().exec() {
+                                    Ok(state_update) => update_state(&mut deck, key, state_update),
+                                    Err(e) => println!("Error during action: {:?}", e),
+                                },
+                            },
+                            (1, 0) => {
+                                match black().exec() {
                                     Ok(state_update) => update_state(&mut deck, key, state_update),
                                     Err(e) => println!("Error during action: {:?}", e),
                                 }
                             }
-                            _ => match green().exec() {
-                                Ok(state_update) => update_state(&mut deck, key, state_update),
-                                Err(e) => println!("Error during action: {:?}", e),
-                            },
+                            (1, 1) => {
+                                print!("h!")
+                            }
+                            (_, _) => {
+                                print!("f!")
+                            }
                         }
-                    } else {
-                        match black().exec() {
-                            Ok(state_update) => update_state(&mut deck, key, state_update),
-                            Err(e) => println!("Error during action: {:?}", e),
-                        }
-                    }
-                })
+                        *previous_state = *current_state;
+                    });
+                println!("");
             }
             Err(e) => println!("Error while handling a key press: {:?}", e),
         }
