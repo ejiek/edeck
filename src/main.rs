@@ -13,6 +13,7 @@ mod action;
 mod bg;
 mod buttons;
 mod config;
+mod shell;
 mod state;
 
 #[tokio::main]

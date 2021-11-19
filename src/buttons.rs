@@ -1,5 +1,6 @@
 use crate::action::Action;
 use crate::bg::*;
+use crate::shell;
 use crate::state::State;
 use std::convert::TryInto;
 use streamdeck::{Colour, Error as DeckError, ImageOptions, StreamDeck};
@@ -15,9 +16,22 @@ pub fn handle(mut deck: StreamDeck) {
                     // We need to know previous state to identify
                     // actual press and release
                     if *state == 1 {
-                        match green().exec() {
-                            Ok(state_update) => update_state(&mut deck, key, state_update),
-                            Err(e) => println!("Error during action: {:?}", e),
+                        match key {
+                            0 => {
+                                match shell::new(vec![
+                                    String::from("/home/ejiek/.xmonad/scripts/volume.sh"),
+                                    String::from("down"),
+                                ])
+                                .exec()
+                                {
+                                    Ok(state_update) => update_state(&mut deck, key, state_update),
+                                    Err(e) => println!("Error during action: {:?}", e),
+                                }
+                            }
+                            _ => match green().exec() {
+                                Ok(state_update) => update_state(&mut deck, key, state_update),
+                                Err(e) => println!("Error during action: {:?}", e),
+                            },
                         }
                     } else {
                         match black().exec() {
