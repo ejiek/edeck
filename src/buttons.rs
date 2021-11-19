@@ -11,21 +11,18 @@ pub fn handle(mut deck: StreamDeck) {
                 println!("{:?}", &states);
 
                 states.iter().enumerate().for_each(|(key, state)| {
+                    // This logic is broken
+                    // We need to know previous state to identify
+                    // actual press and release
                     if *state == 1 {
-                        match key.try_into() {
-                            Ok(key) => match green().exec() {
-                                Ok(state_update) => update_state(&mut deck, key, state_update),
-                                Err(e) => println!("Error during action: {:?}", e),
-                            },
-                            Err(e) => println!("Unable to parse key value: {:?}", e),
+                        match green().exec() {
+                            Ok(state_update) => update_state(&mut deck, key, state_update),
+                            Err(e) => println!("Error during action: {:?}", e),
                         }
                     } else {
-                        match key.try_into() {
-                            Ok(key) => match black().exec() {
-                                Ok(state_update) => update_state(&mut deck, key, state_update),
-                                Err(e) => println!("Error during action: {:?}", e),
-                            },
-                            Err(e) => println!("Unable to parse key value: {:?}", e),
+                        match black().exec() {
+                            Ok(state_update) => update_state(&mut deck, key, state_update),
+                            Err(e) => println!("Error during action: {:?}", e),
                         }
                     }
                 })
@@ -35,20 +32,25 @@ pub fn handle(mut deck: StreamDeck) {
     }
 }
 
-fn update_state(deck: &mut StreamDeck, key: u8, state: State) {
-    match state.image {
-        Some((path, options)) => {
-            println!(
-                "Setting image is not supported yer! Hold on!\n\t img: {}, options {:?}",
-                path, options
-            )
+fn update_state(deck: &mut StreamDeck, key: usize, state: State) {
+    match key.try_into() {
+        Ok(key) => {
+            match state.image {
+                Some((path, options)) => {
+                    println!(
+                        "Setting image is not supported yer! Hold on!\n\t img: {}, options {:?}",
+                        path, options
+                    )
+                }
+                None => {}
+            };
+            match state.colour {
+                Some(colour) => {
+                    deck.set_button_rgb(key, &colour);
+                }
+                None => {}
+            };
         }
-        None => {}
-    };
-    match state.colour {
-        Some(colour) => {
-            deck.set_button_rgb(key, &colour);
-        }
-        None => {}
-    };
+        Err(e) => println!("Unable to parse key value: {:?}", e),
+    }
 }
