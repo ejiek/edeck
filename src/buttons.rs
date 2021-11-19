@@ -49,20 +49,14 @@ pub fn handle(mut deck: StreamDeck) {
 fn update_state(deck: &mut StreamDeck, key: usize, state: State) {
     match key.try_into() {
         Ok(key) => {
-            match state.image {
-                Some((path, options)) => {
-                    println!(
-                        "Setting image is not supported yer! Hold on!\n\t img: {}, options {:?}",
-                        path, options
-                    )
-                }
-                None => {}
+            if let Some((path, options)) = state.image {
+                println!(
+                    "Setting image is not supported yer! Hold on!\n\t img: {}, options {:?}",
+                    path, options
+                )
             };
-            match state.colour {
-                Some(colour) => {
-                    deck.set_button_rgb(key, &colour);
-                }
-                None => {}
+            if let Some(colour) = state.colour {
+                deck.set_button_rgb(key, &colour);
             };
         }
         Err(e) => println!("Unable to parse key value: {:?}", e),
