@@ -1,5 +1,6 @@
 use crate::action::Action;
 use crate::bg::*;
+use crate::mic;
 use crate::shell;
 use crate::state::State;
 use std::convert::TryInto;
@@ -31,17 +32,22 @@ pub fn handle(mut deck: StreamDeck) {
                                         Err(e) => println!("Error during action: {:?}", e),
                                     }
                                 }
+                                14 => match mic::default().exec() {
+                                    Ok(state_update) => update_state(&mut deck, key, state_update),
+                                    Err(e) => println!("Error during action: {:?}", e),
+                                },
                                 _ => match green().exec() {
                                     Ok(state_update) => update_state(&mut deck, key, state_update),
                                     Err(e) => println!("Error during action: {:?}", e),
                                 },
                             },
-                            (1, 0) => {
-                                match black().exec() {
+                            (1, 0) => match key {
+                                14 => {}
+                                _ => match black().exec() {
                                     Ok(state_update) => update_state(&mut deck, key, state_update),
                                     Err(e) => println!("Error during action: {:?}", e),
-                                }
-                            }
+                                },
+                            },
                             (1, 1) => {
                                 print!("h!")
                             }
