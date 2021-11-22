@@ -2,10 +2,27 @@ use crate::action::Action;
 use crate::state::State;
 use std::error::Error;
 use streamdeck::Colour;
-use streamdeck::StreamDeck;
 
 pub struct Bg {
     colour: Colour,
+}
+
+impl Bg {
+    pub fn green() -> Bg {
+        Bg {
+            colour: Colour {
+                r: 50,
+                g: 255,
+                b: 50,
+            },
+        }
+    }
+
+    pub fn black() -> Bg {
+        Bg {
+            colour: Colour { r: 0, g: 0, b: 0 },
+        }
+    }
 }
 
 impl Action for Bg {
@@ -16,20 +33,8 @@ impl Action for Bg {
             brightness: None,
         })
     }
-}
 
-pub fn green() -> Bg {
-    Bg {
-        colour: Colour {
-            r: 50,
-            g: 255,
-            b: 50,
-        },
-    }
-}
-
-pub fn black() -> Bg {
-    Bg {
-        colour: Colour { r: 0, g: 0, b: 0 },
+    fn name(&self) -> String {
+        String::from("Set background")
     }
 }

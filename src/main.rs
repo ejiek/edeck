@@ -13,6 +13,7 @@ mod action;
 mod bg;
 mod buttons;
 mod config;
+mod key;
 mod mic;
 mod shell;
 mod state;

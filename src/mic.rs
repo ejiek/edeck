@@ -3,8 +3,8 @@ use crate::state::State;
 use std::error::Error;
 use std::process::Command;
 use streamdeck::Colour;
-use streamdeck::StreamDeck;
 
+#[derive(Clone)]
 pub struct Mic {
     PA_device: String,
 }
@@ -20,7 +20,7 @@ impl Mic {
         String::from_utf8(mute.stdout).unwrap().contains("yes")
     }
 
-    fn toggle(&self) {
+    fn sys_toggle(&self) {
         Command::new("pactl")
             .arg("set-source-mute")
             .arg(&self.PA_device)
@@ -28,13 +28,35 @@ impl Mic {
             .output()
             .expect("kek");
     }
+
+    pub fn default() -> Mic {
+        let info = Command::new("sh")
+            .arg("-c")
+            .arg("pactl info | grep \"Default Source\" | cut -d \" \" -f3")
+            .output()
+            .expect("kek");
+
+        let mut default = String::from_utf8(info.stdout).unwrap();
+        // getting rid of a new line
+        default.truncate(default.len() - 1);
+
+        Mic { PA_device: default }
+    }
+
+    pub fn get_toggle_action(&self) -> Toggle {
+        Toggle { mic: self.clone() }
+    }
 }
 
-impl Action for Mic {
-    fn exec(&self) -> Result<State, Box<dyn Error>> {
-        self.toggle();
+pub struct Toggle {
+    mic: Mic,
+}
 
-        if self.is_mute() {
+impl Action for Toggle {
+    fn exec(&self) -> Result<State, Box<dyn Error>> {
+        self.mic.sys_toggle();
+
+        if self.mic.is_mute() {
             Ok(State {
                 image: None,
                 colour: Some(Colour { r: 255, g: 0, b: 0 }),
@@ -52,18 +74,16 @@ impl Action for Mic {
             })
         }
     }
+
+    fn name(&self) -> String {
+        String::from("Toggle Microphone")
+    }
 }
 
-pub fn default() -> Mic {
-    let info = Command::new("sh")
-        .arg("-c")
-        .arg("pactl info | grep \"Default Source\" | cut -d \" \" -f3")
-        .output()
-        .expect("kek");
+pub struct Mute {
+    mic: Mic,
+}
 
-    let mut default = String::from_utf8(info.stdout).unwrap();
-    // getting rid of a new line
-    default.truncate(default.len() - 1);
-
-    Mic { PA_device: default }
+pub struct Unmute {
+    mic: Mic,
 }
