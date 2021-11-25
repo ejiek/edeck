@@ -1,7 +1,7 @@
+use crate::dummy::Dummy;
 use crate::key::Key;
 use crate::mic::Mic;
 use crate::shell::Shell;
-use crate::dummy::Dummy;
 
 pub struct Config {
     pub keys: Vec<Key>,

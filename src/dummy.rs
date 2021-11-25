@@ -6,8 +6,8 @@ pub struct Dummy {}
 
 impl Dummy {
     pub fn new() -> Dummy {
-            Dummy{}
-        }
+        Dummy {}
+    }
 }
 
 impl Action for Dummy {
