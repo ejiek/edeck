@@ -4,9 +4,8 @@ use crate::state::State;
 use std::convert::TryInto;
 use streamdeck::{Colour, Error as DeckError, ImageOptions, StreamDeck};
 
-pub fn handle(mut deck: StreamDeck) {
+pub fn handle(mut deck: StreamDeck, config: Config) {
     let mut previous_states: Vec<u8> = vec![0; 15];
-    let config = Config::new();
     loop {
         match deck.read_buttons(None) {
             Ok(states) => {

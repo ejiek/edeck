@@ -59,7 +59,11 @@ impl Action for Toggle {
         if self.mic.is_mute() {
             Ok(State {
                 image: None,
-                colour: Some(Colour { r: 204, g: 36, b: 29 }),
+                colour: Some(Colour {
+                    r: 204,
+                    g: 36,
+                    b: 29,
+                }),
                 brightness: None,
             })
         } else {

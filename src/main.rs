@@ -2,6 +2,7 @@ extern crate streamdeck;
 use streamdeck::{Error as DeckError, ImageOptions, StreamDeck};
 
 extern crate elgato_keylight;
+use crate::config::Config;
 use elgato_keylight::KeyLight;
 use std::error::Error;
 use std::net::Ipv4Addr;
@@ -36,15 +37,11 @@ async fn main() -> Result<(), Box<dyn Error>> {
             std::process::exit(1);
         }
     };
-    println!("image size is: {:?}", deck.image_size());
-    deck.set_button_file(
-        2,
-        "/home/ejiek/.streamdeck/icons/windows.png",
-        &ImageOptions::new(None, false),
-    );
+
+    let config = Config::new();
 
     thread::spawn(move || {
-        buttons::handle(deck);
+        buttons::handle(deck, config);
     });
 
     thread::sleep(time::Duration::from_secs(60));
