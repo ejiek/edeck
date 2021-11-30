@@ -2,7 +2,7 @@ use crate::action::Action;
 use crate::config::Config;
 use crate::state::State;
 use std::convert::TryInto;
-use streamdeck::{Colour, Error as DeckError, ImageOptions, StreamDeck};
+use streamdeck::{StreamDeck};
 
 pub fn handle(mut deck: StreamDeck, config: Config) {
     let mut previous_states: Vec<u8> = vec![0; 15];

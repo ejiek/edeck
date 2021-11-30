@@ -1,12 +1,10 @@
 extern crate streamdeck;
-use streamdeck::{Error as DeckError, ImageOptions, StreamDeck};
+use streamdeck::{StreamDeck};
 
 extern crate elgato_keylight;
+
 use crate::config::Config;
-use elgato_keylight::KeyLight;
 use std::error::Error;
-use std::net::Ipv4Addr;
-use std::str::FromStr;
 use std::thread;
 use std::time;
 
